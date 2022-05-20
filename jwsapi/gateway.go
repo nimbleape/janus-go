@@ -69,15 +69,17 @@ type Connection struct {
 	sessions            map[uint64]*Session
 	sessionCalcels      map[uint64]context.CancelFunc
 	state               connState
+	token               string
 }
 
 //NewConnection create new janus gateway connection
-func NewConnection(ctx context.Context, url string, id int) *Connection {
+func NewConnection(ctx context.Context, url string, id int, token string) *Connection {
 	conn := &Connection{
 		ctx:                 ctx,
 		isDestroy:           0,
 		id:                  id,
 		url:                 url,
+		token:               token,
 		connStateChan:       make(chan cstate, 16),
 		recvChan:            make(chan *Message, 1024),
 		sendChan:            make(chan []byte, 1024),
@@ -337,6 +339,11 @@ func (c *Connection) Request(request Message) (*Message, error) {
 	} else {
 		tid = request[attrTransaction].(string)
 	}
+
+	if c.token != "" {
+		request[attrToken] = c.token
+	}
+
 	defer func() {
 		c.delTransaction(tid)
 	}()
@@ -394,11 +401,10 @@ func (c *Connection) Message(msg Message) (*Message, error) {
 }
 
 //Create ceeate New Session
-func (c *Connection) Create(token string) (*Session, error) {
+func (c *Connection) Create() (*Session, error) {
 
 	msg := Message{
-		attrType:  "create",
-		attrToken: token,
+		attrType: "create",
 	}
 	rsp, err := c.Request(msg)
 	if err != nil {
