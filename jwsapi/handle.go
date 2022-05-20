@@ -78,10 +78,7 @@ func NewHandle(ctx context.Context, id uint64, sess *Session) *Handle {
 
 //IsDestroy is destroy
 func (h *Handle) IsDestroy() bool {
-	if atomic.LoadInt32(&h.isDestroy) == 1 {
-		return true
-	}
-	return false
+	return atomic.LoadInt32(&h.isDestroy) == 1
 }
 
 //SetCallback set callback using WithHandleWebrtcup,WithHandleMedia...

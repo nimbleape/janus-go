@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/cihub/seelog"
-	"github.com/newzai/janus-go/jwsapi"
-	"github.com/newzai/janus-go/jwsapi/jplugin/jvideoroom"
-	"github.com/newzai/janus-go/logging"
-	"github.com/newzai/janus-go/videoroom"
+	"github.com/nimbleape/janus-go/jwsapi"
+	"github.com/nimbleape/janus-go/jwsapi/jplugin/jvideoroom"
+	"github.com/nimbleape/janus-go/logging"
+	"github.com/nimbleape/janus-go/videoroom"
 	"github.com/pion/webrtc/v2"
 	"github.com/pkg/errors"
 )

@@ -38,10 +38,7 @@ func NewSession(ctx context.Context, id uint64, conn *Connection) *Session {
 
 //IsDestroy session has destroy
 func (s *Session) IsDestroy() bool {
-	if atomic.LoadInt32(&s.isDestroy) == 1 {
-		return true
-	}
-	return false
+	return atomic.LoadInt32(&s.isDestroy) == 1
 }
 
 func (s *Session) addHandle(h *Handle, cancel context.CancelFunc) {

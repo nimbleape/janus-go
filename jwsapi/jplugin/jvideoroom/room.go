@@ -1,6 +1,6 @@
 package jvideoroom
 
-import "github.com/newzai/janus-go/jwsapi"
+import "github.com/nimbleape/janus-go/jwsapi"
 
 //Room room info
 type Room struct {
