@@ -109,10 +109,7 @@ func (c *Connection) ID() string {
 
 //IsDestroy is destroy for this object
 func (c *Connection) IsDestroy() bool {
-	if atomic.LoadInt32(&c.isDestroy) == 1 {
-		return true
-	}
-	return false
+	return atomic.LoadInt32(&c.isDestroy) == 1
 }
 
 func (c *Connection) tryConnection() {
