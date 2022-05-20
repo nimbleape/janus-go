@@ -3,7 +3,7 @@ package jvideoroom
 import (
 	"context"
 
-	"github.com/newzai/janus-go/jwsapi"
+	"github.com/nimbleape/janus-go/jwsapi"
 	"github.com/pkg/errors"
 )
 

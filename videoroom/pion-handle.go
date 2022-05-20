@@ -3,7 +3,7 @@ package videoroom
 import (
 	"context"
 
-	"github.com/newzai/janus-go/jwsapi"
+	"github.com/nimbleape/janus-go/jwsapi"
 	"github.com/pion/webrtc/v2"
 )
 

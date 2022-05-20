@@ -1,7 +1,7 @@
 package jvideoroom
 
 import (
-	"github.com/newzai/janus-go/jwsapi"
+	"github.com/nimbleape/janus-go/jwsapi"
 )
 
 //UserType user type , publisher, subscriber

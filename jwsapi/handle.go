@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync/atomic"
 
-	"github.com/newzai/janus-go/logging"
+	"github.com/nimbleape/janus-go/logging"
 	"github.com/pkg/errors"
 )
 

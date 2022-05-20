@@ -10,7 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	"github.com/newzai/janus-go/logging"
+	"github.com/nimbleape/janus-go/logging"
 	"github.com/pkg/errors"
 )
 
