@@ -30,9 +30,9 @@ type onResponse func(*Message)
 type cstate int
 
 const (
-	connectioing cstate = 1
-	connectioned cstate = 2
-	closed       cstate = 3
+	connecting cstate = 1
+	connected  cstate = 2
+	closed     cstate = 3
 )
 
 type connState struct {
@@ -90,7 +90,7 @@ func NewConnection(ctx context.Context, url string, id int) *Connection {
 		retrySeconds:        3,
 		readBufferLimit:     maxMessageSize,
 		state: connState{
-			state: connectioing,
+			state: connecting,
 			ts:    time.Now(),
 		},
 	}
@@ -135,9 +135,7 @@ func (c *Connection) tryConnection() {
 	c.conn = conn
 	go c.readDump(c.conn)
 	go c.writeDump(c.conn)
-	c.connStateChan <- connectioned
-
-	return
+	c.connStateChan <- connected
 }
 
 func (c *Connection) readDump(conn *websocket.Conn) {
@@ -239,7 +237,7 @@ func (c *Connection) execLoop() {
 				c.connCancel()
 
 				go c.tryConnection()
-			case connectioned:
+			case connected:
 				//链接建立..
 
 				for _, sess := range c.sessions {
