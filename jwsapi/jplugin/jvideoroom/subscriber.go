@@ -11,7 +11,7 @@ import (
 type Subscriber struct {
 	ctx    context.Context
 	handle *jwsapi.Handle
-	room   uint64
+	room   string
 	feed   uint64
 }
 
@@ -23,7 +23,7 @@ func WithSubscriberPubID(pubID uint64) jwsapi.MessageOption {
 }
 
 //NewSubscriber create a subscriber
-func NewSubscriber(ctx context.Context, h *jwsapi.Handle, room uint64, feed uint64) *Subscriber {
+func NewSubscriber(ctx context.Context, h *jwsapi.Handle, room string, feed uint64) *Subscriber {
 
 	s := &Subscriber{
 		ctx:    ctx,
@@ -35,7 +35,7 @@ func NewSubscriber(ctx context.Context, h *jwsapi.Handle, room uint64, feed uint
 }
 
 //Room return room id
-func (s *Subscriber) Room() uint64 {
+func (s *Subscriber) Room() string {
 	return s.room
 }
 

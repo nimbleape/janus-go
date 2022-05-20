@@ -24,7 +24,7 @@ const (
 type Publisher struct {
 	ctx     context.Context
 	handle  *jwsapi.Handle
-	room    uint64
+	room    string
 	id      uint64
 	display string
 	parts   map[uint64]Participant
@@ -76,7 +76,7 @@ func WithPublisherOptionLeaved(callback func(uint64)) PublisherOption {
 }
 
 //NewPublisher create new publisher
-func NewPublisher(ctx context.Context, h *jwsapi.Handle, room uint64, opts ...PublisherOption) *Publisher {
+func NewPublisher(ctx context.Context, h *jwsapi.Handle, room string, opts ...PublisherOption) *Publisher {
 
 	p := &Publisher{
 		ctx:    ctx,
@@ -107,7 +107,7 @@ func (p *Publisher) Display() string {
 }
 
 //Room get room
-func (p *Publisher) Room() uint64 {
+func (p *Publisher) Room() string {
 	return p.room
 }
 

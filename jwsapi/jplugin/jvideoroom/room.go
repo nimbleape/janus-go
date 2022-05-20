@@ -8,8 +8,8 @@ type Room struct {
 }
 
 //ID room id
-func (r *Room) ID() uint64 {
-	room, _ := r.Uint64("room")
+func (r *Room) ID() string {
+	room, _ := r.String("room")
 	return room
 }
 
