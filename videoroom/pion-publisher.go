@@ -50,7 +50,7 @@ func WithPublisherConfigure(configure webrtc.Configuration) PublisherOption {
 }
 
 //NewPublisher new publihser
-func NewPublisher(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room uint64, opts ...jvideoroom.PublisherOption) *Publisher {
+func NewPublisher(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room string, opts ...jvideoroom.PublisherOption) *Publisher {
 	p := &Publisher{
 		BaseSession: BaseSession{
 			ctx:    ctx,
@@ -73,7 +73,7 @@ func (p *Publisher) Object() *jvideoroom.Publisher {
 
 //ID return id info
 func (p *Publisher) ID() string {
-	return fmt.Sprintf("[%d.%d]", p.jPub.Room(), p.jPub.ID())
+	return fmt.Sprintf("[%s.%d]", p.jPub.Room(), p.jPub.ID())
 }
 
 //SetOption set option

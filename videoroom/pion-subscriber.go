@@ -46,7 +46,7 @@ func WithSubscriberConfigure(configure webrtc.Configuration) SubscriberOption {
 }
 
 //NewSubscriber new subscriber
-func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room uint64, feed uint64) *Subscriber {
+func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room string, feed uint64) *Subscriber {
 	s := &Subscriber{
 		BaseSession: BaseSession{
 			ctx:    ctx,
@@ -74,7 +74,7 @@ func (s *Subscriber) Object() *jvideoroom.Subscriber {
 
 //ID return id for this subscriber
 func (s *Subscriber) ID() string {
-	return fmt.Sprintf("[%d.Feed.%d", s.jSub.Room(), s.jSub.Feed())
+	return fmt.Sprintf("[%s.Feed.%d", s.jSub.Room(), s.jSub.Feed())
 }
 
 //SetOption set option, for callback
