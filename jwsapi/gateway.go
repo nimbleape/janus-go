@@ -69,17 +69,15 @@ type Connection struct {
 	sessions            map[uint64]*Session
 	sessionCalcels      map[uint64]context.CancelFunc
 	state               connState
-	token               string
 }
 
 //NewConnection create new janus gateway connection
-func NewConnection(ctx context.Context, url string, id int, token string) *Connection {
+func NewConnection(ctx context.Context, url string, id int) *Connection {
 	conn := &Connection{
 		ctx:                 ctx,
 		isDestroy:           0,
 		id:                  id,
 		url:                 url,
-		token:               token,
 		connStateChan:       make(chan cstate, 16),
 		recvChan:            make(chan *Message, 1024),
 		sendChan:            make(chan []byte, 1024),
