@@ -20,6 +20,8 @@ const (
 	AttrRequest   = "request"
 	attrVideoRoom = "videoroom"
 	attrJSEP      = "jsep"
+	attrApiSecret = "apisecret"
+	attrToken     = "token"
 )
 
 //Message janus message
