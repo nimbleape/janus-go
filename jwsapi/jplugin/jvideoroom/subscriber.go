@@ -12,18 +12,18 @@ type Subscriber struct {
 	ctx    context.Context
 	handle *jwsapi.Handle
 	room   string
-	feed   uint64
+	feed   string
 }
 
 //WithSubscriberPubID set publisher_id for subscriber
-func WithSubscriberPubID(pubID uint64) jwsapi.MessageOption {
+func WithSubscriberPubID(pubID string) jwsapi.MessageOption {
 	return func(msg jwsapi.Message) {
 		msg["publisher_id"] = pubID
 	}
 }
 
 //NewSubscriber create a subscriber
-func NewSubscriber(ctx context.Context, h *jwsapi.Handle, room string, feed uint64) *Subscriber {
+func NewSubscriber(ctx context.Context, h *jwsapi.Handle, room string, feed string) *Subscriber {
 
 	s := &Subscriber{
 		ctx:    ctx,
@@ -40,7 +40,7 @@ func (s *Subscriber) Room() string {
 }
 
 //Feed return feed is
-func (s *Subscriber) Feed() uint64 {
+func (s *Subscriber) Feed() string {
 	return s.feed
 }
 
@@ -142,7 +142,7 @@ func (s *Subscriber) Configure(opts ...jwsapi.MessageOption) error {
 }
 
 //Switch switch stream from feed to new feed
-func (s *Subscriber) Switch(newFeed uint64, opts ...jwsapi.MessageOption) error {
+func (s *Subscriber) Switch(newFeed string, opts ...jwsapi.MessageOption) error {
 
 	body := jwsapi.Message{
 		jwsapi.AttrRequest: "switch",

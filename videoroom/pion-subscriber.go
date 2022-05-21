@@ -46,7 +46,7 @@ func WithSubscriberConfigure(configure webrtc.Configuration) SubscriberOption {
 }
 
 //NewSubscriber new subscriber
-func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room string, feed uint64) *Subscriber {
+func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room string, feed string) *Subscriber {
 	s := &Subscriber{
 		BaseSession: BaseSession{
 			ctx:    ctx,

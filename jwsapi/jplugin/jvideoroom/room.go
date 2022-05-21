@@ -19,8 +19,8 @@ type Participant struct {
 }
 
 //ID return publisher id
-func (r *Participant) ID() uint64 {
-	id, _ := r.Uint64("id")
+func (r *Participant) ID() string {
+	id, _ := r.String("id")
 	return id
 }
 

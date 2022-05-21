@@ -26,7 +26,7 @@ func (ut UserType) String() string {
 }
 
 //WithMessageOptionRoom set room id
-func WithMessageOptionRoom(room uint64) jwsapi.MessageOption {
+func WithMessageOptionRoom(room string) jwsapi.MessageOption {
 	return func(param jwsapi.Message) {
 		param["room"] = room
 	}
@@ -56,7 +56,7 @@ func WithMessageOptionSecret(secret string) jwsapi.MessageOption {
 //CreateRoom create room from janus-gateway videoroom plugin
 //jwsapi.WithMessageOption("publishers",10) to set publishers parm
 //see https://janus.conf.meetecho.com/docs/videoroom.html create room param
-func CreateRoom(h *jwsapi.Handle, opts ...jwsapi.MessageOption) (uint64, error) {
+func CreateRoom(h *jwsapi.Handle, opts ...jwsapi.MessageOption) (string, error) {
 	msg := jwsapi.Message{
 		jwsapi.AttrRequest: "create",
 	}
@@ -70,7 +70,7 @@ func CreateRoom(h *jwsapi.Handle, opts ...jwsapi.MessageOption) (uint64, error) 
 	}
 	pluginData := rsp.PluginData()
 	data := pluginData.Data()
-	room, ok := data.Uint64("room")
+	room, ok := data.String("room")
 	if !ok {
 		return 0, data.PluginDataError()
 	}
@@ -78,7 +78,7 @@ func CreateRoom(h *jwsapi.Handle, opts ...jwsapi.MessageOption) (uint64, error) 
 }
 
 //DestroyRoom destroy room
-func DestroyRoom(h *jwsapi.Handle, room uint64, opts ...jwsapi.MessageOption) error {
+func DestroyRoom(h *jwsapi.Handle, room string, opts ...jwsapi.MessageOption) error {
 
 	msg := jwsapi.Message{
 		jwsapi.AttrRequest: "destroy",
@@ -96,7 +96,7 @@ func DestroyRoom(h *jwsapi.Handle, room uint64, opts ...jwsapi.MessageOption) er
 }
 
 //Exists check room is exists
-func Exists(h *jwsapi.Handle, room uint64) (bool, error) {
+func Exists(h *jwsapi.Handle, room string) (bool, error) {
 	msg := jwsapi.Message{
 		jwsapi.AttrRequest: "exists",
 		"room":             room,
@@ -138,7 +138,7 @@ func List(h *jwsapi.Handle) ([]Room, error) {
 }
 
 //Listparticipants get all room publishers
-func Listparticipants(h *jwsapi.Handle, room uint64) ([]Participant, error) {
+func Listparticipants(h *jwsapi.Handle, room string) ([]Participant, error) {
 	msg := jwsapi.Message{
 		jwsapi.AttrRequest: "listparticipants",
 		"room":             room,
