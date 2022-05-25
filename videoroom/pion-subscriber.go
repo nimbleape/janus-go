@@ -3,11 +3,12 @@ package videoroom
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/nimbleape/janus-go/jwsapi"
 	"github.com/nimbleape/janus-go/jwsapi/jplugin/jvideoroom"
 	"github.com/nimbleape/janus-go/logging"
-	"github.com/pion/webrtc/v2"
+	"github.com/pion/webrtc/v3"
 	"github.com/pkg/errors"
 )
 
@@ -17,22 +18,22 @@ type Subscriber struct {
 	jSub         *jvideoroom.Subscriber
 	transceivers []*webrtc.RTPTransceiver //using for send rtcp to remote, RR
 
-	onAudioTrack func(context.Context, *webrtc.Track)
-	onVideoTrack func(context.Context, *webrtc.Track)
+	onAudioTrack func(context.Context, *webrtc.TrackRemote)
+	onVideoTrack func(context.Context, *webrtc.TrackRemote)
 }
 
 //SubscriberOption option for Subscriber
 type SubscriberOption func(*Subscriber)
 
 //WithSubscriberAudioTrack using to setting audio track callback
-func WithSubscriberAudioTrack(callback func(context.Context, *webrtc.Track)) SubscriberOption {
+func WithSubscriberAudioTrack(callback func(context.Context, *webrtc.TrackRemote)) SubscriberOption {
 	return func(s *Subscriber) {
 		s.onAudioTrack = callback
 	}
 }
 
 //WithSubscriberVideoTrack using to setting audio track callback
-func WithSubscriberVideoTrack(callback func(context.Context, *webrtc.Track)) SubscriberOption {
+func WithSubscriberVideoTrack(callback func(context.Context, *webrtc.TrackRemote)) SubscriberOption {
 	return func(s *Subscriber) {
 		s.onVideoTrack = callback
 	}
@@ -53,6 +54,11 @@ func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room 
 			api:    api,
 			handle: h,
 			configure: webrtc.Configuration{
+				ICEServers: []webrtc.ICEServer{
+					{
+						URLs: []string{"stun:stun.l.google.com:19302"},
+					},
+				},
 				SDPSemantics: webrtc.SDPSemanticsUnifiedPlanWithFallback,
 			},
 			remoteCandidates: make(chan jwsapi.Message, 8),
@@ -74,7 +80,7 @@ func (s *Subscriber) Object() *jvideoroom.Subscriber {
 
 //ID return id for this subscriber
 func (s *Subscriber) ID() string {
-	return fmt.Sprintf("[%s.Feed.%d", s.jSub.Room(), s.jSub.Feed())
+	return fmt.Sprintf("[%s.Feed.%s", s.jSub.Room(), s.jSub.Feed())
 }
 
 //SetOption set option, for callback
@@ -95,8 +101,11 @@ func (s *Subscriber) Start(opts ...jwsapi.MessageOption) error {
 
 	offer, err := s.jSub.Join(opts...)
 	if err != nil {
+		log.Printf("error joining: %v\n", err)
 		return errors.Wrap(err, "join")
 	}
+
+	log.Printf("offer from janus: %v\n", offer)
 
 	api := initAPI(offer)
 	if api != nil {
@@ -114,42 +123,49 @@ func (s *Subscriber) Start(opts ...jwsapi.MessageOption) error {
 	pc.OnICECandidate(s.onICECandidate)
 	pc.OnICEConnectionStateChange(s.onICEConnectionStateChange)
 
+	err = pc.SetRemoteDescription(webrtc.SessionDescription{
+		Type: webrtc.SDPTypeOffer,
+		SDP:  offer,
+	})
+	if err != nil {
+		pc.Close()
+		log.Printf("error setting remote description: %v\n", err)
+		return errors.Wrap(err, "pc.SetRemoteDescription")
+	}
+
 	recvOnly := webrtc.RtpTransceiverInit{Direction: webrtc.RTPTransceiverDirectionRecvonly}
-	at, err := pc.AddTransceiver(webrtc.RTPCodecTypeAudio, recvOnly)
+	at, err := pc.AddTransceiverFromKind(webrtc.RTPCodecTypeAudio, recvOnly)
 
 	if err != nil {
 		pc.Close()
+		log.Printf("error adding audio transceiver: %v\n", err)
 		return errors.Wrap(err, "AddTransceiver(Audio)")
 	}
 	s.transceivers = append(s.transceivers, at)
 
-	vt, err := pc.AddTransceiver(webrtc.RTPCodecTypeVideo, recvOnly)
+	vt, err := pc.AddTransceiverFromKind(webrtc.RTPCodecTypeVideo, recvOnly)
 	if err != nil {
 		pc.Close()
+		log.Printf("error adding video transceiver: %v\n", err)
 		return errors.Wrap(err, "AddTransceiver(Video)")
 	}
 	s.transceivers = append(s.transceivers, vt)
 
-	answer, err := pc.CreateOffer(nil)
+	answer, err := pc.CreateAnswer(nil)
 	if err != nil {
 		pc.Close()
+		log.Printf("error creating offer: %v\n", err)
 		return errors.Wrap(err, "pc.CreateOffer")
 	}
+
+	log.Printf("offer from local: %v\n", answer)
+
 	pc.SetLocalDescription(answer)
 
 	err = s.jSub.Start(answer.SDP, true)
 	if err != nil {
 		pc.Close()
 		return errors.Wrap(err, "jvideoroom.Subscriber.Start")
-	}
-
-	err = pc.SetRemoteDescription(webrtc.SessionDescription{
-		Type: webrtc.SDPTypeAnswer,
-		SDP:  offer,
-	})
-	if err != nil {
-		pc.Close()
-		return errors.Wrap(err, "pc.SetRemoteDescription")
 	}
 
 	go s.doRemoteCandidate(s.remoteCandidates)
@@ -169,7 +185,7 @@ func (s *Subscriber) onHangup(msg jwsapi.Message) {
 	s.pc.Close()
 }
 func (s *Subscriber) onWebrtcup(msg jwsapi.Message) {
-
+	log.Printf("webrtcup\n")
 	for _, tr := range s.transceivers {
 		go s.startRTPTransceiver(tr)
 	}
@@ -177,11 +193,19 @@ func (s *Subscriber) onWebrtcup(msg jwsapi.Message) {
 
 func (s *Subscriber) onICEConnectionStateChange(state webrtc.ICEConnectionState) {
 	logging.Infof("ICEConnectionState %s", state.String())
+	log.Printf("ICEConnectionState: %s\n", state.String())
 }
 func (s *Subscriber) onPeerConnectionState(state webrtc.PeerConnectionState) {
 	logging.Infof("PeerConnectionState %s", state.String())
+	log.Printf("PeerConnectionState: %s\n", state.String())
 }
-func (s *Subscriber) onTrack(track *webrtc.Track, receiver *webrtc.RTPReceiver) {
+
+// func (s *Subscriber) onICECandidate(candidate webrtc.ICECandidate) {
+// 	log.Printf("Ice Candidate: %v\n", candidate)
+// }
+
+func (s *Subscriber) onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+	log.Printf("onTrack")
 
 	logging.Infof("%s onTrack %s SSRC %d PT %d", s.ID(), track.Kind().String(), track.SSRC(), track.PayloadType())
 
@@ -207,7 +231,7 @@ func (s *Subscriber) onTrack(track *webrtc.Track, receiver *webrtc.RTPReceiver) 
 			return
 		default:
 			//read rtp form track...
-			_, err := track.ReadRTP()
+			_, _, err := track.ReadRTP()
 			if err != nil {
 				return
 			}
@@ -223,7 +247,7 @@ func (s *Subscriber) startRTPTransceiver(tr *webrtc.RTPTransceiver) {
 			return
 		default:
 			if sender := tr.Sender(); sender != nil {
-				_, err := sender.ReadRTCP()
+				_, _, err := sender.ReadRTCP()
 				if err != nil {
 					return
 				}
@@ -239,7 +263,7 @@ func (s *Subscriber) startReceiver(receiver *webrtc.RTPReceiver) {
 		case <-s.ctx.Done():
 			return
 		default:
-			_, err := receiver.ReadRTCP()
+			_, _, err := receiver.ReadRTCP()
 			if err != nil {
 				return
 			}

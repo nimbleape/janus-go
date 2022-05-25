@@ -375,6 +375,10 @@ func (c *Connection) Message(msg Message) (*Message, error) {
 		tid = msg[attrTransaction].(string)
 	}
 
+	if c.token != "" {
+		msg[attrToken] = c.token
+	}
+
 	defer func() {
 		c.delTransaction(tid)
 	}()

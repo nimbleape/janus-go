@@ -2,9 +2,10 @@ package videoroom
 
 import (
 	"context"
+	"log"
 
 	"github.com/nimbleape/janus-go/jwsapi"
-	"github.com/pion/webrtc/v2"
+	"github.com/pion/webrtc/v3"
 )
 
 //BaseSession base session
@@ -64,6 +65,7 @@ func (s *BaseSession) onTrickle(msg jwsapi.Message) {
 }
 
 func (s *BaseSession) onICECandidate(candidate *webrtc.ICECandidate) {
+	log.Printf("local ice candidate from local: %v\n", candidate)
 
 	if candidate == nil {
 		s.handle.Trickle(jwsapi.Message{
@@ -71,9 +73,7 @@ func (s *BaseSession) onICECandidate(candidate *webrtc.ICECandidate) {
 		})
 	} else {
 		s.handle.Trickle(jwsapi.Message{
-			"candidate":     candidate.String(),
-			"sdpMLineIndex": 0,
-			"sdpMid":        "audio",
+			"candidate": candidate.String(),
 		})
 	}
 }

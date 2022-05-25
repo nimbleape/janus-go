@@ -2,6 +2,7 @@ package jwsapi
 
 import (
 	"context"
+	"log"
 	"sync/atomic"
 
 	"github.com/nimbleape/janus-go/logging"
@@ -114,6 +115,8 @@ func (h *Handle) Message(body Message) (*Message, error) {
 		attrHandleID: h.ID,
 		attrBody:     body,
 	}
+
+	log.Printf("message body: %v\n", msg)
 	return h.s.Message(msg)
 }
 

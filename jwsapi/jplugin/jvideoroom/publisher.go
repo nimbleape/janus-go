@@ -149,8 +149,8 @@ func (p *Publisher) Join(opts ...jwsapi.MessageOption) error {
 	data := pluginData.Data()
 	p.id, _ = data.Uint64("id")
 
-	publishers := data.Array("publishers")
-	p.onPublishers(publishers)
+	//publishers := data.Array("publishers")
+	//p.onPublishers(publishers)
 
 	p.state = PublisherStateJoined
 
@@ -215,24 +215,24 @@ func (p *Publisher) Leave() error {
 	return err
 }
 
-func (p *Publisher) onPublishers(publishers []interface{}) {
-	for _, pub := range publishers {
-		part := Participant{jwsapi.Message(pub.(map[string]interface{}))}
-		id := part.ID()
-		if id > 0 {
-			p.parts[id] = part
-			if p.onNewPublisher != nil {
-				p.onNewPublisher(part)
-			}
-		}
+// func (p *Publisher) onPublishers(publishers []interface{}) {
+// 	for _, pub := range publishers {
+// 		part := Participant{jwsapi.Message(pub.(map[string]interface{}))}
+// 		id := part.ID()
+// 		if id > 0 {
+// 			p.parts[id] = part
+// 			if p.onNewPublisher != nil {
+// 				p.onNewPublisher(part)
+// 			}
+// 		}
 
-	}
-}
+// 	}
+// }
 
 func (p *Publisher) onPluginEvent(event jwsapi.Message) {
 
 	if publishers := event.Array("publishers"); publishers != nil {
-		p.onPublishers(publishers)
+		//p.onPublishers(publishers)
 	} else if unpublished, ok := event.Uint64("unpublished"); ok {
 		delete(p.parts, unpublished)
 		if p.onUnpublished != nil {
