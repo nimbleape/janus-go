@@ -18,22 +18,22 @@ type Subscriber struct {
 	jSub         *jvideoroom.Subscriber
 	transceivers []*webrtc.RTPTransceiver //using for send rtcp to remote, RR
 
-	onAudioTrack func(context.Context, *webrtc.TrackRemote, *webrtc.RTPReceiver)
-	onVideoTrack func(context.Context, *webrtc.TrackRemote, *webrtc.RTPReceiver)
+	onAudioTrack func(context.Context, *webrtc.PeerConnection, *webrtc.TrackRemote, *webrtc.RTPReceiver)
+	onVideoTrack func(context.Context, *webrtc.PeerConnection, *webrtc.TrackRemote, *webrtc.RTPReceiver)
 }
 
 //SubscriberOption option for Subscriber
 type SubscriberOption func(*Subscriber)
 
 //WithSubscriberAudioTrack using to setting audio track callback
-func WithSubscriberAudioTrack(callback func(context.Context, *webrtc.TrackRemote, *webrtc.RTPReceiver)) SubscriberOption {
+func WithSubscriberAudioTrack(callback func(context.Context, *webrtc.PeerConnection, *webrtc.TrackRemote, *webrtc.RTPReceiver)) SubscriberOption {
 	return func(s *Subscriber) {
 		s.onAudioTrack = callback
 	}
 }
 
 //WithSubscriberVideoTrack using to setting audio track callback
-func WithSubscriberVideoTrack(callback func(context.Context, *webrtc.TrackRemote, *webrtc.RTPReceiver)) SubscriberOption {
+func WithSubscriberVideoTrack(callback func(context.Context, *webrtc.PeerConnection, *webrtc.TrackRemote, *webrtc.RTPReceiver)) SubscriberOption {
 	return func(s *Subscriber) {
 		s.onVideoTrack = callback
 	}
@@ -214,12 +214,12 @@ func (s *Subscriber) onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPRece
 	switch track.Kind() {
 	case webrtc.RTPCodecTypeAudio:
 		if s.onAudioTrack != nil {
-			s.onAudioTrack(s.ctx, track, receiver)
+			s.onAudioTrack(s.ctx, s.pc, track, receiver)
 			return
 		}
 	case webrtc.RTPCodecTypeVideo:
 		if s.onVideoTrack != nil {
-			s.onVideoTrack(s.ctx, track, receiver)
+			s.onVideoTrack(s.ctx, s.pc, track, receiver)
 			return
 		}
 	}
