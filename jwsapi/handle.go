@@ -140,8 +140,9 @@ func (h *Handle) JsepMessage(body Message, jsep Message) (*Message, error) {
 func (h *Handle) Trickle(candidate Message) error {
 
 	msg := Message{
-		attrType:    "trickle",
-		"candidate": candidate,
+		attrType:     "trickle",
+		attrHandleID: h.ID,
+		"candidate":  candidate,
 	}
 
 	_, err := h.s.Request(msg)

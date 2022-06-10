@@ -73,7 +73,9 @@ func (s *BaseSession) onICECandidate(candidate *webrtc.ICECandidate) {
 		})
 	} else {
 		s.handle.Trickle(jwsapi.Message{
-			"candidate": candidate.String(),
+			"candidate":     candidate.String(),
+			"sdpMid":        "",
+			"sdpMLineIndex": uint16(0),
 		})
 	}
 }

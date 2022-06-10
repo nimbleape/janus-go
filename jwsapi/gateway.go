@@ -258,7 +258,9 @@ func (c *Connection) execLoop() {
 				//find tid
 				trans, ok := c.transactions[tid]
 				if ok {
-					trans(msg)
+					if !msg.IsACK() {
+						trans(msg)
+					}
 				} else {
 					logging.Warnf("%s can't find trans by %s", c.ID(), tid)
 				}
@@ -387,14 +389,6 @@ func (c *Connection) Message(msg Message) (*Message, error) {
 	c.sendMessage(tid, msg, func(rsp *Message) {
 		result <- rsp
 	})
-	select {
-	case rsp := <-result:
-		if rsp.IsError() {
-			return nil, rsp.Error()
-		}
-	case <-time.After(3 * time.Second):
-		return nil, errors.New("timeout")
-	}
 
 	select {
 	case rsp := <-result:
