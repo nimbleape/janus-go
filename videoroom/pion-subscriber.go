@@ -101,11 +101,8 @@ func (s *Subscriber) Start(opts ...jwsapi.MessageOption) error {
 
 	offer, err := s.jSub.Join(opts...)
 	if err != nil {
-		log.Printf("error joining: %v\n", err)
 		return errors.Wrap(err, "join")
 	}
-
-	log.Printf("offer from janus: %v\n", offer)
 
 	api := initAPI(offer)
 	if api != nil {
@@ -129,7 +126,6 @@ func (s *Subscriber) Start(opts ...jwsapi.MessageOption) error {
 	})
 	if err != nil {
 		pc.Close()
-		log.Printf("error setting remote description: %v\n", err)
 		return errors.Wrap(err, "pc.SetRemoteDescription")
 	}
 
@@ -138,7 +134,6 @@ func (s *Subscriber) Start(opts ...jwsapi.MessageOption) error {
 
 	if err != nil {
 		pc.Close()
-		log.Printf("error adding audio transceiver: %v\n", err)
 		return errors.Wrap(err, "AddTransceiver(Audio)")
 	}
 	s.transceivers = append(s.transceivers, at)
@@ -146,7 +141,6 @@ func (s *Subscriber) Start(opts ...jwsapi.MessageOption) error {
 	vt, err := pc.AddTransceiverFromKind(webrtc.RTPCodecTypeVideo, recvOnly)
 	if err != nil {
 		pc.Close()
-		log.Printf("error adding video transceiver: %v\n", err)
 		return errors.Wrap(err, "AddTransceiver(Video)")
 	}
 	s.transceivers = append(s.transceivers, vt)
@@ -154,11 +148,8 @@ func (s *Subscriber) Start(opts ...jwsapi.MessageOption) error {
 	answer, err := pc.CreateAnswer(nil)
 	if err != nil {
 		pc.Close()
-		log.Printf("error creating offer: %v\n", err)
 		return errors.Wrap(err, "pc.CreateOffer")
 	}
-
-	log.Printf("offer from local: %v\n", answer)
 
 	pc.SetLocalDescription(answer)
 
@@ -199,10 +190,6 @@ func (s *Subscriber) onPeerConnectionState(state webrtc.PeerConnectionState) {
 	logging.Infof("PeerConnectionState %s", state.String())
 	log.Printf("PeerConnectionState: %s\n", state.String())
 }
-
-// func (s *Subscriber) onICECandidate(candidate webrtc.ICECandidate) {
-// 	log.Printf("Ice Candidate: %v\n", candidate)
-// }
 
 func (s *Subscriber) onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 	log.Printf("onTrack")
