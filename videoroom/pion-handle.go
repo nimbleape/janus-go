@@ -68,11 +68,11 @@ func (s *BaseSession) onICECandidate(candidate *webrtc.ICECandidate) {
 	log.Printf("local ice candidate from local: %v\n", candidate)
 
 	if candidate == nil {
-		s.handle.Trickle(jwsapi.Message{
+		go s.handle.Trickle(jwsapi.Message{
 			"completed": true,
 		})
 	} else {
-		s.handle.Trickle(jwsapi.Message{
+		go s.handle.Trickle(jwsapi.Message{
 			"candidate":     candidate.String(),
 			"sdpMid":        "",
 			"sdpMLineIndex": uint16(0),
