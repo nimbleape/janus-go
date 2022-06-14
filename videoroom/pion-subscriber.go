@@ -191,6 +191,10 @@ func (s *Subscriber) onPeerConnectionState(state webrtc.PeerConnectionState) {
 	log.Printf("PeerConnectionState: %s\n", state.String())
 }
 
+// func (s *Subscriber) onICECandidate(candidate *webrtc.ICECandidate) {
+// 	log.Printf("local ice candidate from local: %v\n", candidate)
+// }
+
 func (s *Subscriber) onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 	log.Printf("onTrack")
 

@@ -143,8 +143,8 @@ func (h *Handle) Trickle(candidate Message) error {
 		"candidate":  candidate,
 	}
 
-	_, err := h.s.Request(msg)
-	return err
+	h.s.Request(msg)
+	return nil
 }
 
 //Detach release plugin handle at janus-gateway
