@@ -1,9 +1,8 @@
 module github.com/nimbleape/janus-go
 
-go 1.12
+go 1.18
 
 require (
-	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.4.1
 	github.com/pion/rtp/v2 v2.0.0

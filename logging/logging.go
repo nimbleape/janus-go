@@ -1,6 +1,6 @@
 package logging
 
-//LoggerInterface logger 
+//LoggerInterface logger
 type LoggerInterface interface {
 
 	// Tracef formats message according to format specifier
@@ -17,13 +17,13 @@ type LoggerInterface interface {
 
 	// Warnf formats message according to format specifier
 	// and writes to log with level = Warn.
-	Warnf(format string, params ...interface{}) error
+	Warnf(format string, params ...interface{})
 
 	// Errorf formats message according to format specifier
 	// and writes to log with level = Error.
-	Errorf(format string, params ...interface{}) error
+	Errorf(format string, params ...interface{})
 
-	
+
 
 	// Trace formats message using the default formats for its operands
 	// and writes to log with level = Trace
@@ -39,11 +39,11 @@ type LoggerInterface interface {
 
 	// Warn formats message using the default formats for its operands
 	// and writes to log with level = Warn
-	Warn(v ...interface{}) error
+	Warn(v ...interface{})
 
 	// Error formats message using the default formats for its operands
 	// and writes to log with level = Error
-	Error(v ...interface{}) error
+	Error(v ...interface{})
 }
 
 
@@ -60,7 +60,7 @@ func (d *defaultLogger)	Tracef(format string, params ...interface{}){
 // Debugf formats message according to format specifier
 // and writes to log with level = Debug.
 func (d *defaultLogger)Debugf(format string, params ...interface{}){
-	
+
 }
 
 // Infof formats message according to format specifier
@@ -71,14 +71,14 @@ func (d *defaultLogger)Infof(format string, params ...interface{}){
 
 // Warnf formats message according to format specifier
 // and writes to log with level = Warn.
-func (d *defaultLogger)Warnf(format string, params ...interface{}) error{
-	return nil
+func (d *defaultLogger)Warnf(format string, params ...interface{}){
+
 }
 
 // Errorf formats message according to format specifier
 // and writes to log with level = Error.
-func (d *defaultLogger)Errorf(format string, params ...interface{}) error{
-	return nil
+func (d *defaultLogger)Errorf(format string, params ...interface{}){
+
 }
 
 
@@ -102,22 +102,21 @@ func (d *defaultLogger)Info(v ...interface{}){
 
 // Warn formats message using the default formats for its operands
 // and writes to log with level = Warn
-func (d *defaultLogger)Warn(v ...interface{}) error{
-	return nil
+func (d *defaultLogger)Warn(v ...interface{}){
 }
 
 // Error formats message using the default formats for its operands
 // and writes to log with level = Error
-func (d *defaultLogger)Error(v ...interface{}) error{
-	return nil
+func (d *defaultLogger)Error(v ...interface{}){
+
 }
 
-var current LoggerInterface 
+var current LoggerInterface
 
 func init() {
 	current = &defaultLogger{}
 }
-//SetLogger set logger 
+//SetLogger set logger
 func SetLogger( logger LoggerInterface){
 	current = logger
 }
@@ -143,14 +142,14 @@ func	Infof(format string, params ...interface{}){
 
 // Warnf formats message according to format specifier
 // and writes to log with level = Warn.
-func	Warnf(format string, params ...interface{}) error{
-	return current.Warnf(format,params...)
+func	Warnf(format string, params ...interface{}){
+	current.Warnf(format,params...)
 }
 
 // Errorf formats message according to format specifier
 // and writes to log with level = Error.
-func	Errorf(format string, params ...interface{}) error{
-	return current.Errorf(format,params...)
+func	Errorf(format string, params ...interface{}){
+	current.Errorf(format,params...)
 }
 
 
@@ -175,12 +174,12 @@ func Info(v ...interface{}){
 
 // Warn formats message using the default formats for its operands
 // and writes to log with level = Warn
-func Warn(v ...interface{}) error{
-	return current.Warn(v...)
+func Warn(v ...interface{}){
+	current.Warn(v...)
 }
 
 // Error formats message using the default formats for its operands
 // and writes to log with level = Error
-func Error(v ...interface{}) error{
-	return current.Error(v...)
+func Error(v ...interface{}){
+	current.Error(v...)
 }
