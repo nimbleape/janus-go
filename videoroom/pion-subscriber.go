@@ -3,7 +3,6 @@ package videoroom
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/nimbleape/janus-go/jwsapi"
 	"github.com/nimbleape/janus-go/jwsapi/jplugin/jvideoroom"
@@ -176,7 +175,6 @@ func (s *Subscriber) onHangup(msg jwsapi.Message) {
 	s.pc.Close()
 }
 func (s *Subscriber) onWebrtcup(msg jwsapi.Message) {
-	log.Printf("webrtcup\n")
 	for _, tr := range s.transceivers {
 		go s.startRTPTransceiver(tr)
 	}
@@ -184,11 +182,9 @@ func (s *Subscriber) onWebrtcup(msg jwsapi.Message) {
 
 func (s *Subscriber) onICEConnectionStateChange(state webrtc.ICEConnectionState) {
 	logging.Infof("ICEConnectionState %s", state.String())
-	log.Printf("ICEConnectionState: %s\n", state.String())
 }
 func (s *Subscriber) onPeerConnectionState(state webrtc.PeerConnectionState) {
 	logging.Infof("PeerConnectionState %s", state.String())
-	log.Printf("PeerConnectionState: %s\n", state.String())
 }
 
 // func (s *Subscriber) onICECandidate(candidate *webrtc.ICECandidate) {
@@ -196,8 +192,6 @@ func (s *Subscriber) onPeerConnectionState(state webrtc.PeerConnectionState) {
 // }
 
 func (s *Subscriber) onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
-	log.Printf("onTrack")
-
 	logging.Infof("%s onTrack %s SSRC %d PT %d", s.ID(), track.Kind().String(), track.SSRC(), track.PayloadType())
 
 	go s.startReceiver(receiver)

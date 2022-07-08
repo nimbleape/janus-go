@@ -23,8 +23,6 @@ type LoggerInterface interface {
 	// and writes to log with level = Error.
 	Errorf(format string, params ...interface{})
 
-
-
 	// Trace formats message using the default formats for its operands
 	// and writes to log with level = Trace
 	Trace(v ...interface{})
@@ -46,68 +44,65 @@ type LoggerInterface interface {
 	Error(v ...interface{})
 }
 
-
 type defaultLogger struct {
-
 }
 
-	// Tracef formats message according to format specifier
-	// and writes to log with level = Trace.
-func (d *defaultLogger)	Tracef(format string, params ...interface{}){
+// Tracef formats message according to format specifier
+// and writes to log with level = Trace.
+func (d *defaultLogger) Tracef(format string, params ...interface{}) {
 
 }
 
 // Debugf formats message according to format specifier
 // and writes to log with level = Debug.
-func (d *defaultLogger)Debugf(format string, params ...interface{}){
+func (d *defaultLogger) Debugf(format string, params ...interface{}) {
 
 }
 
 // Infof formats message according to format specifier
 // and writes to log with level = Info.
-func (d *defaultLogger)Infof(format string, params ...interface{}){
+func (d *defaultLogger) Infof(format string, params ...interface{}) {
 
 }
 
 // Warnf formats message according to format specifier
 // and writes to log with level = Warn.
-func (d *defaultLogger)Warnf(format string, params ...interface{}){
+func (d *defaultLogger) Warnf(format string, params ...interface{}) {
 
 }
 
 // Errorf formats message according to format specifier
 // and writes to log with level = Error.
-func (d *defaultLogger)Errorf(format string, params ...interface{}){
+func (d *defaultLogger) Errorf(format string, params ...interface{}) {
 
 }
 
-
 // Trace formats message using the default formats for its operands
 // and writes to log with level = Trace
-func (d *defaultLogger)Trace(v ...interface{}){
+func (d *defaultLogger) Trace(v ...interface{}) {
 
 }
 
 // Debug formats message using the default formats for its operands
 // and writes to log with level = Debug
-func (d *defaultLogger)Debug(v ...interface{}){
+func (d *defaultLogger) Debug(v ...interface{}) {
 
 }
 
 // Info formats message using the default formats for its operands
 // and writes to log with level = Info
-func (d *defaultLogger)Info(v ...interface{}){
+func (d *defaultLogger) Info(v ...interface{}) {
 
 }
 
 // Warn formats message using the default formats for its operands
 // and writes to log with level = Warn
-func (d *defaultLogger)Warn(v ...interface{}){
+func (d *defaultLogger) Warn(v ...interface{}) {
 }
 
 // Error formats message using the default formats for its operands
 // and writes to log with level = Error
-func (d *defaultLogger)Error(v ...interface{}){
+func (d *defaultLogger) Error(v ...interface{}) {
 
 }
 
@@ -116,70 +111,68 @@ var current LoggerInterface
 func init() {
 	current = &defaultLogger{}
 }
+
 //SetLogger set logger
-func SetLogger( logger LoggerInterface){
+func SetLogger(logger LoggerInterface) {
 	current = logger
 }
 
-
 // Tracef formats message according to format specifier
 // and writes to log with level = Trace.
-func Tracef(format string, params ...interface{}){
-	current.Tracef(format,params...)
+func Tracef(format string, params ...interface{}) {
+	current.Tracef(format, params...)
 }
 
 // Debugf formats message according to format specifier
 // and writes to log with level = Debug.
-func	Debugf(format string, params ...interface{}){
-	current.Debugf(format,params...)
+func Debugf(format string, params ...interface{}) {
+	current.Debugf(format, params...)
 }
 
 // Infof formats message according to format specifier
 // and writes to log with level = Info.
-func	Infof(format string, params ...interface{}){
-	current.Infof(format,params...)
+func Infof(format string, params ...interface{}) {
+	current.Infof(format, params...)
 }
 
 // Warnf formats message according to format specifier
 // and writes to log with level = Warn.
-func	Warnf(format string, params ...interface{}){
-	current.Warnf(format,params...)
+func Warnf(format string, params ...interface{}) {
+	current.Warnf(format, params...)
 }
 
 // Errorf formats message according to format specifier
 // and writes to log with level = Error.
-func	Errorf(format string, params ...interface{}){
-	current.Errorf(format,params...)
+func Errorf(format string, params ...interface{}) {
+	current.Errorf(format, params...)
 }
-
-
 
 // Trace formats message using the default formats for its operands
 // and writes to log with level = Trace
-func Trace(v ...interface{}){
+func Trace(v ...interface{}) {
 	current.Trace(v...)
 }
 
 // Debug formats message using the default formats for its operands
 // and writes to log with level = Debug
-func Debug(v ...interface{}){
+func Debug(v ...interface{}) {
 	current.Debug(v...)
 }
 
 // Info formats message using the default formats for its operands
 // and writes to log with level = Info
-func Info(v ...interface{}){
+func Info(v ...interface{}) {
 	current.Info(v...)
 }
 
 // Warn formats message using the default formats for its operands
 // and writes to log with level = Warn
-func Warn(v ...interface{}){
+func Warn(v ...interface{}) {
 	current.Warn(v...)
 }
 
 // Error formats message using the default formats for its operands
 // and writes to log with level = Error
-func Error(v ...interface{}){
+func Error(v ...interface{}) {
 	current.Error(v...)
 }

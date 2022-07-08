@@ -2,7 +2,6 @@ package videoroom
 
 import (
 	"context"
-	"log"
 
 	"github.com/nimbleape/janus-go/jwsapi"
 	"github.com/pion/webrtc/v3"
@@ -65,8 +64,6 @@ func (s *BaseSession) onTrickle(msg jwsapi.Message) {
 }
 
 func (s *BaseSession) onICECandidate(candidate *webrtc.ICECandidate) {
-	log.Printf("local ice candidate from local: %v\n", candidate)
-
 	if candidate == nil {
 		go s.handle.Trickle(jwsapi.Message{
 			"completed": true,
