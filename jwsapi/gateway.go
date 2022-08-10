@@ -69,11 +69,11 @@ type Connection struct {
 	sessions            map[uint64]*Session
 	sessionCalcels      map[uint64]context.CancelFunc
 	state               connState
-	token               string
+	token               *string
 }
 
 //NewConnection create new janus gateway connection
-func NewConnection(ctx context.Context, url string, id int, token string) *Connection {
+func NewConnection(ctx context.Context, url string, id int, token *string) *Connection {
 	conn := &Connection{
 		ctx:                 ctx,
 		isDestroy:           0,
@@ -216,6 +216,7 @@ func (c *Connection) execLoop() {
 	for {
 		select {
 		case <-c.ctx.Done():
+			logging.Infof("Connection context is done, returning")
 			return
 		case <-ticker.C:
 			if c.state.state == closed && time.Since(c.state.ts) > time.Duration(10)*time.Second {
@@ -251,18 +252,21 @@ func (c *Connection) execLoop() {
 			t(c)
 		case msg, ok := <-c.recvChan:
 			if !ok {
+				logging.Infof("connection recvChan not ok, returning (%v)", msg)
 				return
 			}
 			tid, ok := msg.Transaction()
 			if ok {
 				//find tid
+				logging.Infof("transactions callback map %v", c.transactions)
 				trans, ok := c.transactions[tid]
 				if ok {
 					if !msg.IsACK() {
+						logging.Infof("message is transaction and isnt an ack, calling callback")
 						trans(msg)
 					}
 				} else {
-					logging.Warnf("%s can't find trans by %s", c.ID(), tid)
+					logging.Warnf("%s can't find trans callback tid: %s", c.ID(), tid)
 				}
 			} else {
 				sid, ok := msg.SessionID()
@@ -319,9 +323,11 @@ func (c *Connection) delTransaction(tid string) {
 
 func (c *Connection) sendMessage(tid string, msg Message, callback onResponse) {
 	if c.IsDestroy() {
+		logging.Info("sendMessage returning as connection is destroyed")
 		return
 	}
 	c.run(func(cc *Connection) {
+		logging.Infof("Putting transaction callback into map %s", tid)
 		cc.transactions[tid] = callback
 	})
 
@@ -342,7 +348,7 @@ func (c *Connection) Request(request Message) (*Message, error) {
 		tid = request[attrTransaction].(string)
 	}
 
-	if c.token != "" {
+	if c.token != nil {
 		request[attrToken] = c.token
 	}
 
@@ -359,7 +365,7 @@ func (c *Connection) Request(request Message) (*Message, error) {
 		return rsp, rsp.Error()
 	case <-time.After(3 * time.Second):
 	}
-	return nil, errors.New("timeout")
+	return nil, errors.New("request timeout tid:" + tid)
 
 }
 
@@ -377,7 +383,7 @@ func (c *Connection) Message(msg Message) (*Message, error) {
 		tid = msg[attrTransaction].(string)
 	}
 
-	if c.token != "" {
+	if c.token != nil {
 		msg[attrToken] = c.token
 	}
 
@@ -394,7 +400,7 @@ func (c *Connection) Message(msg Message) (*Message, error) {
 	case rsp := <-result:
 		return rsp, rsp.Error()
 	case <-time.After(3 * time.Second):
-		return nil, errors.New("timeout")
+		return nil, errors.New("message timeout")
 	}
 }
 
@@ -417,5 +423,3 @@ func (c *Connection) Create() (*Session, error) {
 	}
 	return nil, errors.New("response err")
 }
-
-
