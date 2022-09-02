@@ -67,7 +67,7 @@ func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room 
 
 	h.SetCallback(jwsapi.WithHandleTrickle(s.onTrickle))
 	h.SetCallback(jwsapi.WithHandleHangup(s.onHangup))
-	h.SetCallback(jwsapi.WithHandleWebrtcup(s.onWebrtcup))
+	// h.SetCallback(jwsapi.WithHandleWebrtcup(s.onWebrtcup))
 
 	return s
 }
