@@ -112,6 +112,19 @@ func (c *Connection) IsDestroy() bool {
 	return atomic.LoadInt32(&c.isDestroy) == 1
 }
 
+func (c *Connection) State() string {
+	switch c.state.state {
+	case connecting:
+		return "connecting"
+	case connected:
+		return "connected"
+	case closed:
+		return "closed"
+	default:
+		return "unknown"
+	}
+}
+
 func (c *Connection) tryConnection() {
 
 	c.cc++
