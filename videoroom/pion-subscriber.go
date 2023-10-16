@@ -2,7 +2,6 @@ package videoroom
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/nimbleape/janus-go/jwsapi"
 	"github.com/nimbleape/janus-go/jwsapi/jplugin/jvideoroom"
@@ -11,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-//Subscriber a subscriber object.
+// Subscriber a subscriber object.
 type Subscriber struct {
 	BaseSession
 	jSub         *jvideoroom.Subscriber
@@ -21,32 +20,32 @@ type Subscriber struct {
 	onVideoTrack func(context.Context, *webrtc.PeerConnection, *webrtc.TrackRemote, *webrtc.RTPReceiver)
 }
 
-//SubscriberOption option for Subscriber
+// SubscriberOption option for Subscriber
 type SubscriberOption func(*Subscriber)
 
-//WithSubscriberAudioTrack using to setting audio track callback
+// WithSubscriberAudioTrack using to setting audio track callback
 func WithSubscriberAudioTrack(callback func(context.Context, *webrtc.PeerConnection, *webrtc.TrackRemote, *webrtc.RTPReceiver)) SubscriberOption {
 	return func(s *Subscriber) {
 		s.onAudioTrack = callback
 	}
 }
 
-//WithSubscriberVideoTrack using to setting audio track callback
+// WithSubscriberVideoTrack using to setting audio track callback
 func WithSubscriberVideoTrack(callback func(context.Context, *webrtc.PeerConnection, *webrtc.TrackRemote, *webrtc.RTPReceiver)) SubscriberOption {
 	return func(s *Subscriber) {
 		s.onVideoTrack = callback
 	}
 }
 
-//WithSubscriberConfigure set webrtc configure
+// WithSubscriberConfigure set webrtc configure
 func WithSubscriberConfigure(configure webrtc.Configuration) SubscriberOption {
 	return func(s *Subscriber) {
 		s.configure = configure
 	}
 }
 
-//NewSubscriber new subscriber
-func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room string, feed string) *Subscriber {
+// NewSubscriber new subscriber
+func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room string, streams []interface{}) *Subscriber {
 	s := &Subscriber{
 		BaseSession: BaseSession{
 			ctx:    ctx,
@@ -55,6 +54,7 @@ func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room 
 			configure: webrtc.Configuration{
 				ICEServers: []webrtc.ICEServer{
 					{
+						// this should probably be done better?
 						URLs: []string{"stun:stun.l.google.com:19302"},
 					},
 				},
@@ -62,7 +62,7 @@ func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room 
 			},
 			remoteCandidates: make(chan jwsapi.Message, 8),
 		},
-		jSub: jvideoroom.NewSubscriber(ctx, h, room, feed),
+		jSub: jvideoroom.NewSubscriber(ctx, h, room, streams),
 	}
 
 	h.SetCallback(jwsapi.WithHandleTrickle(s.onTrickle))
@@ -72,17 +72,17 @@ func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room 
 	return s
 }
 
-//Object return jvideoroom.Subscriber
+// Object return jvideoroom.Subscriber
 func (s *Subscriber) Object() *jvideoroom.Subscriber {
 	return s.jSub
 }
 
-//ID return id for this subscriber
-func (s *Subscriber) ID() string {
-	return fmt.Sprintf("[%s.Feed.%s", s.jSub.Room(), s.jSub.Feed())
-}
+// ID return id for this subscriber
+// func (s *Subscriber) ID() string {
+// 	return fmt.Sprintf("[%s.Feed.%s", s.jSub.Room(), s.jSub.Feed())
+// }
 
-//SetOption set option, for callback
+// SetOption set option, for callback
 func (s *Subscriber) SetOption(opts ...SubscriberOption) *Subscriber {
 	for _, opt := range opts {
 		opt(s)
@@ -90,12 +90,12 @@ func (s *Subscriber) SetOption(opts ...SubscriberOption) *Subscriber {
 	return s
 }
 
-//Start start pull stream from janus
-//audio,video default is true, data default is false
-//optional or default param can use jwsapi.WithMessageOption to setting
-//other params see  https://jwsapi.conf.meetecho.com/docs/videoroom.html VideoRoom Subscribers join
-//jwsapi.WithMessageOption("video",false) to ignore video stream
-//janus-gateway must open ice-lite=true
+// Start start pull stream from janus
+// audio,video default is true, data default is false
+// optional or default param can use jwsapi.WithMessageOption to setting
+// other params see  https://jwsapi.conf.meetecho.com/docs/videoroom.html VideoRoom Subscribers join
+// jwsapi.WithMessageOption("video",false) to ignore video stream
+// janus-gateway must open ice-lite=true
 func (s *Subscriber) Start(opts ...jwsapi.MessageOption) error {
 
 	offer, err := s.jSub.Join(opts...)
@@ -162,7 +162,7 @@ func (s *Subscriber) Start(opts ...jwsapi.MessageOption) error {
 	return nil
 }
 
-//Leave leave pull stream
+// Leave leave pull stream
 func (s *Subscriber) Leave() error {
 	if s.pc != nil {
 		s.pc.Close()
@@ -192,7 +192,7 @@ func (s *Subscriber) onPeerConnectionState(state webrtc.PeerConnectionState) {
 // }
 
 func (s *Subscriber) onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
-	logging.Infof("%s onTrack %s SSRC %d PT %d", s.ID(), track.Kind().String(), track.SSRC(), track.PayloadType())
+	logging.Infof("onTrack %s SSRC %d PT %d", track.Kind().String(), track.SSRC(), track.PayloadType())
 
 	go s.startReceiver(receiver)
 
