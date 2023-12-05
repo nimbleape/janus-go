@@ -168,7 +168,7 @@ func (c *Connection) readDump(conn *websocket.Conn) {
 				c.connStateChan <- closed
 				return
 			}
-			logging.Infof("%s recv %s", c.ID(), string(data))
+			logging.Debugf("%s recv %s", c.ID(), string(data))
 			message := bytes.TrimSpace(bytes.Replace(data, newline, space, -1))
 
 			decoder := json.NewDecoder(bytes.NewBuffer(message))
@@ -206,7 +206,7 @@ func (c *Connection) writeDump(conn *websocket.Conn) {
 				c.connStateChan <- closed
 				return
 			}
-			logging.Infof("%s write ok %s", c.ID(), string(data))
+			logging.Debugf("%s write ok %s", c.ID(), string(data))
 
 		}
 	}
@@ -265,17 +265,17 @@ func (c *Connection) execLoop() {
 			t(c)
 		case msg, ok := <-c.recvChan:
 			if !ok {
-				logging.Infof("connection recvChan not ok, returning (%v)", msg)
+				logging.Debugf("connection recvChan not ok, returning (%v)", msg)
 				return
 			}
 			tid, ok := msg.Transaction()
 			if ok {
 				//find tid
-				logging.Infof("transactions callback map %v", c.transactions)
+				// logging.Infof("transactions callback map %v", c.transactions)
 				trans, ok := c.transactions[tid]
 				if ok {
 					if !msg.IsACK() {
-						logging.Infof("message is transaction and isnt an ack, calling callback")
+						logging.Debug("message is transaction and isnt an ack, calling callback")
 						trans(msg)
 					}
 				} else {
@@ -340,7 +340,7 @@ func (c *Connection) sendMessage(tid string, msg Message, callback onResponse) {
 		return
 	}
 	c.run(func(cc *Connection) {
-		logging.Infof("Putting transaction callback into map %s", tid)
+		logging.Debugf("Putting transaction callback into map %s", tid)
 		cc.transactions[tid] = callback
 	})
 

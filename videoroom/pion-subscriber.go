@@ -46,20 +46,13 @@ func WithSubscriberConfigure(configure webrtc.Configuration) SubscriberOption {
 }
 
 //NewSubscriber new subscriber
-func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room string, feed string) *Subscriber {
+func NewSubscriber(ctx context.Context, api *webrtc.API, h *jwsapi.Handle, room string, feed string, configuration webrtc.Configuration) *Subscriber {
 	s := &Subscriber{
 		BaseSession: BaseSession{
 			ctx:    ctx,
 			api:    api,
 			handle: h,
-			configure: webrtc.Configuration{
-				ICEServers: []webrtc.ICEServer{
-					{
-						URLs: []string{"stun:stun.l.google.com:19302"},
-					},
-				},
-				SDPSemantics: webrtc.SDPSemanticsUnifiedPlanWithFallback,
-			},
+			configure: configuration,
 			remoteCandidates: make(chan jwsapi.Message, 8),
 		},
 		jSub: jvideoroom.NewSubscriber(ctx, h, room, feed),
